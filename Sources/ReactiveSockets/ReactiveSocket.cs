@@ -10,8 +10,8 @@
     using UniRx;
 
     /// <summary>
-    /// Implements the reactive socket base class, which is used 
-    /// on the <see cref="IReactiveListener"/> for accepted connections, 
+    /// Implements the reactive socket base class, which is used
+    /// on the <see cref="IReactiveListener"/> for accepted connections,
     /// as well as a base class for the <see cref="ReactiveClient"/>.
     /// </summary>
     public class ReactiveSocket : IReactiveSocket, IDisposable
@@ -20,12 +20,12 @@
 
         private bool disposed;
         private TcpClient client;
-        // This allows us to write to the underlying socket in a 
+        // This allows us to write to the underlying socket in a
         // single-threaded fashion.
         private object syncLock = new object();
         private IDisposable readSubscription;
 
-        // This allows protocols to be easily built by consuming 
+        // This allows protocols to be easily built by consuming
         // bytes from the stream using Rx expressions.
         private PseudoBlockingCollection<byte> received = new PseudoBlockingCollection<byte>();
 
@@ -43,7 +43,7 @@
         private int receiveBufferSize = 8192;
 
         /// <summary>
-        /// Initializes the socket with a previously accepted TCP 
+        /// Initializes the socket with a previously accepted TCP
         /// client connection. This overload is used by the <see cref="ReactiveListener"/>.
         /// </summary>
         internal ReactiveSocket(TcpClient client)
@@ -54,7 +54,7 @@
         }
 
         /// <summary>
-        /// Protected constructor used by <see cref="ReactiveClient"/> 
+        /// Protected constructor used by <see cref="ReactiveClient"/>
         /// client.
         /// </summary>
         protected internal ReactiveSocket()
@@ -84,21 +84,21 @@
         public bool IsConnected { get { return client != null && client.Connected; } }
 
         /// <summary>
-        /// Observable bytes that are being received by this endpoint. Note that 
-        /// subscribing to the receiver blocks until a byte is received, so 
-        /// subscribers will typically use the extension method <c>SubscribeOn</c> 
+        /// Observable bytes that are being received by this endpoint. Note that
+        /// subscribing to the receiver blocks until a byte is received, so
+        /// subscribers will typically use the extension method <c>SubscribeOn</c>
         /// to specify the scheduler to use for subscription.
         /// </summary>
         /// <remarks>
-        /// This blocking characteristic also propagates to higher level channels built 
-        /// on top of this socket, but it's not necessary to use SubscribeOn 
+        /// This blocking characteristic also propagates to higher level channels built
+        /// on top of this socket, but it's not necessary to use SubscribeOn
         /// at more than one level.
         /// </remarks>
         public IObservable<byte> Receiver { get { return receiver; } }
 
         /// <summary>
-        /// Observable bytes that are being sent through this endpoint 
-        /// by using the <see cref="SendAsync(byte[])"/> or 
+        /// Observable bytes that are being sent through this endpoint
+        /// by using the <see cref="SendAsync(byte[])"/> or
         /// <see cref="SendAsync(byte[], CancellationToken)"/>  methods.
         /// </summary>
         public IObservable<byte> Sender { get { return sender; } }
@@ -122,7 +122,7 @@
         }
 
         /// <summary>
-        /// Gets the TcpClient stream to use. 
+        /// Gets the TcpClient stream to use.
         /// </summary>
         /// <remarks>Virtual so it can be overridden to implement SSL</remarks>
         protected virtual System.IO.Stream GetStream()
@@ -186,14 +186,15 @@
         /// </summary>
         protected void Disconnect()
         {
-            if (!IsConnected)
-                throw new InvalidOperationException(Strings.TcpClientSocket.DisconnectingNotConnected);
+            if (!IsConnected) {
+                throw new InvalidOperationException("reactive-socket not connected, can't disconnect");
+            }
 
             Disconnect(false);
         }
 
         /// <summary>
-        /// Disconnects the socket, specifying if this is being called 
+        /// Disconnects the socket, specifying if this is being called
         /// from Dispose.
         /// </summary>
         protected void Disconnect(bool disposing)

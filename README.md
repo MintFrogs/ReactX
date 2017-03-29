@@ -5,8 +5,8 @@ your project.
 
 ### Versions
 
-[UniRx fd3bd85](https://github.com/neuecc/UniRx/commit/fd3bd85094090dd0e86d2c17e2ade5d7169b295e)
-[ReactiveSockets d4a2a0b](https://github.com/neuecc/reactivesockets/commit/d4a2a0b4ac09ee72c534564859884f2a27f24631)
+- [UniRx fd3bd85](https://github.com/neuecc/UniRx/commit/fd3bd85094090dd0e86d2c17e2ade5d7169b295e)
+- [ReactiveSockets d4a2a0b](https://github.com/neuecc/reactivesockets/commit/d4a2a0b4ac09ee72c534564859884f2a27f24631)
 
 ### Usage
 
