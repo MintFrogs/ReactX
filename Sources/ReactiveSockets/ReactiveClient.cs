@@ -15,6 +15,7 @@ namespace ReactiveSockets
         private static readonly ITracer tracer = Tracer.Get<ReactiveClient>();
         private string hostname;
         private int port;
+        private AddressFamily addressFamily = AddressFamily.InterNetwork;
         private readonly Func<Stream, Stream> streamTransform;
         private Stream stream;
         private readonly object getStreamLock = new object();
@@ -40,12 +41,12 @@ namespace ReactiveSockets
         /// <code>
         /// var client  = new ReactiveClient(host, port, stream => {
         ///   var ssl = new SslStream(
-        ///     stream, 
+        ///     stream,
         ///     userCertificateValidationCallback: (sender, certificate, chain, errors) => true  // ignore SSL cert validation
         ///   );
         ///   ssl.AuthenticateAsClient(host);
         ///   return ssl;
-        /// } 
+        /// }
         /// </code>
         /// </example>
         public ReactiveClient(string hostname, int port, Func<Stream, Stream> streamTransform)
@@ -56,12 +57,21 @@ namespace ReactiveSockets
             tracer.ReactiveClientCreated(hostname, port);
         }
 
+        public ReactiveClient(string hostname, int port, AddressFamily addressFamily, Func<Stream, Stream> streamTransform)
+        {
+            this.hostname = hostname;
+            this.port = port;
+            this.streamTransform = streamTransform;
+            this.addressFamily = addressFamily;
+            tracer.ReactiveClientCreated(hostname, port);
+        }
+
         /// <summary>
         /// Attemps to connect to the TCP server.
         /// </summary>
         public IObservable<Unit> ConnectAsync()
         {
-            var client = new TcpClient();
+            TcpClient client = AddressFamily.InterNetwork != this.addressFamily ? new TcpClient(this.addressFamily) : new TcpClient();
             return ObservableEx
                 .FromAsyncPattern<string, int>(client.BeginConnect, client.EndConnect)(hostname, port)
                 .Do(_ => Connect(client));
